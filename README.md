@@ -1,8 +1,12 @@
 # AuthSystem 现代登录注册模板项目文档
-![CSDN图标](https://lr-luorui.cn/assets/QQ20250511-172846.png")
+
 ## 一、项目概述
 
 AuthSystem 现代登录注册模板是一个采用 HTML、Tailwind CSS 和 JavaScript 构建的登录注册系统。它以简洁高效的方式实现用户登录和注册功能，同时配备主题切换、表单验证、密码强度检查等实用特性，还内置开发测试工具，为开发者提供便捷的测试环境，适用于各类 Web 项目快速集成登录注册模块。
+
+
+
+![AuthSystem登录注册模板界面](https://lr-luorui.cn/assets/QQ20250511-172846.png)
 
 ## 二、项目结构
 
