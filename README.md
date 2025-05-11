@@ -12,7 +12,7 @@ AuthSystem 现代登录注册模板是一个采用 HTML、Tailwind CSS 和 JavaS
 
 ### 主要文件
 
-`index (20).html`：作为项目核心文件，承载了整个登录注册系统的 HTML 结构、CSS 样式和 JavaScript 代码，实现页面展示与交互逻辑。
+`index-AuthSystem.html`：作为项目核心文件，承载了整个登录注册系统的 HTML 结构、CSS 样式和 JavaScript 代码，实现页面展示与交互逻辑。
 
 ### 目录结构
 
@@ -23,7 +23,7 @@ AuthSystem 现代登录注册模板是一个采用 HTML、Tailwind CSS 和 JavaS
 ```
 .
 
-└── index (20).html
+└── index-AuthSystem.html
 ```
 
 ## 三、功能特性
@@ -107,7 +107,7 @@ AuthSystem 现代登录注册模板是一个采用 HTML、Tailwind CSS 和 JavaS
 
 
 ```
-git clone <项目仓库地址>
+git clone https://github.com/l-r-lr/AuthSystem-.git
 ```
 
 ### 2. 运行项目
