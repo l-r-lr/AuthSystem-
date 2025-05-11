@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录注册</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#8B5CF6',
+                        danger: '#EF4444',
+                        warning: '#F59E0B',
+                        info: '#06B6D4',
+                        light: '#F3F4F6',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'light-bg': "url('https://lr-luorui.cn/static/background.png')",
+                        'dark-bg': "url('https://lr-luorui.cn/static/background-dark.webp')",
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .glass {
+                backdrop-filter: blur(10px);
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+            .glass-dark {
+                backdrop-filter: blur(10px);
+                background-color: rgba(31, 41, 55, 0.7);
+            }
+            .input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300;
+            }
+            .btn-hover {
+                @apply hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300;
+            }
+            .form-shake {
+                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            }
+            @keyframes shake {
+                10%, 90% { transform: translateX(-1px); }
+                20%, 80% { transform: translateX(2px); }
+                30%, 50%, 70% { transform: translateX(-4px); }
+                40%, 60% { transform: translateX(4px); }
+            }
+        }
+    </style>
+</head>
+<body class="font-inter min-h-screen bg-light dark:bg-dark transition-colors duration-300">
+    <!-- 背景图 -->
+    <div class="fixed inset-0 z-0 bg-cover bg-center blur-[10px]" id="background">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 dark:from-dark/50 dark:to-dark/70"></div>
+    </div>
+
+    <!-- 顶部导航 -->
+    <header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4">
+        <div class="text-2xl font-bold text-white text-shadow-lg">
+            <span class="text-primary">Auth</span><span class="text-accent">System</span>
+        </div>
+        <button id="theme-toggle" class="w-12 h-12 rounded-full glass dark:glass-dark flex items-center justify-center text-white shadow-lg hover:bg-white/30 dark:hover:bg-dark/80 transition-all duration-300">
+            <i class="fa-regular fa-sun text-xl"></i>
+        </button>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <!-- 登录注册卡片 -->
+        <div class="w-full max-w-md">
+            <div class="glass dark:glass-dark rounded-2xl shadow-2xl p-8 transform transition-all duration-500 hover:shadow-xl">
+                <!-- 切换按钮 -->
+                <div class="flex mb-8">
+                    <button id="login-tab" class="flex-1 py-3 text-lg font-semibold text-white border-b-2 border-primary">登录</button>
+                    <button id="register-tab" class="flex-1 py-3 text-lg font-semibold text-white/70 border-b-2 border-transparent">注册</button>
+                </div>
+
+                <!-- 登录表单 -->
+                <form id="login-form" class="space-y-6">
+                    <div class="space-y-2">
+                        <label for="login-email" class="block text-sm font-medium text-white">电子邮箱</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">
+                                <i class="fa-regular fa-envelope"></i>
+                            </span>
+                            <input type="email" id="login-email" name="login-email" placeholder="your@email.com" class="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 dark:bg-dark/30 border border-white/20 dark:border-white/10 text-white placeholder-white/50 input-focus">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="login-password" class="block text-sm font-medium text-white">密码</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">
+                                <i class="fa-regular fa-lock"></i>
+                            </span>
+                            <input type="password" id="login-password" name="login-password" placeholder="••••••••" class="w-full pl-10 pr-10 py-3 rounded-lg bg-white/10 dark:bg-dark/30 border border-white/20 dark:border-white/10 text-white placeholder-white/50 input-focus">
+                            <button type="button" id="login-toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3 text-white/70 hover:text-white">
+                                <i class="fa-regular fa-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember-me" type="checkbox" class="w-4 h-4 rounded bg-white/10 border-white/20 text-primary focus:ring-primary">
+                            <label for="remember-me" class="ml-2 text-sm text-white/80">记住我</label>
+                        </div>
+                        <a href="#" class="text-sm text-primary hover:text-primary/80 transition-colors">忘记密码?</a>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium shadow-md btn-hover">
+                        登录
+                    </button>
+
+                    <div class="text-center text-white/70 text-sm">
+                        还没有账号? <button type="button" id="switch-to-register" class="text-primary hover:text-primary/80 font-medium">立即注册</button>
+                    </div>
+                </form>
+
+                <!-- 注册表单 -->
+                <form id="register-form" class="space-y-6 hidden">
+                    <div class="space-y-2">
+                        <label for="register-email" class="block text-sm font-medium text-white">电子邮箱</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">
+                                <i class="fa-regular fa-envelope"></i>
+                            </span>
+                            <input type="email" id="register-email" name="register-email" placeholder="your@email.com" class="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 dark:bg-dark/30 border border-white/20 dark:border-white/10 text-white placeholder-white/50 input-focus">
+                        </div>
+                        <div id="email-error" class="hidden text-xs text-danger bg-danger/10 p-2 rounded mt-1">
+                            <i class="fa-regular fa-exclamation-circle mr-1"></i>
+                            <span>请输入有效的电子邮箱地址</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="register-username" class="block text-sm font-medium text-white">用户名</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">
+                                <i class="fa-regular fa-user"></i>
+                            </span>
+                            <input type="text" id="register-username" name="register-username" placeholder="输入用户名" class="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 dark:bg-dark/30 border border-white/20 dark:border-white/10 text-white placeholder-white/50 input-focus">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="register-password" class="block text-sm font-medium text-white">密码</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">
+                                <i class="fa-regular fa-lock"></i>
+                            </span>
+                            <input type="password" id="register-password" name="register-password" placeholder="至少8位，包含大小写字母" class="w-full pl-10 pr-10 py-3 rounded-lg bg-white/10 dark:bg-dark/30 border border-white/20 dark:border-white/10 text-white placeholder-white/50 input-focus">
+                            <button type="button" id="register-toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3 text-white/70 hover:text-white">
+                                <i class="fa-regular fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <div id="password-strength" class="text-xs text-white/70 bg-white/5 dark:bg-dark/20 p-2 rounded mt-1">
+                            <div class="flex items-center justify-between mb-1">
+                                <span>密码强度</span>
+                                <span id="strength-text">弱</span>
+                            </div>
+                            <div class="w-full bg-white/20 rounded-full h-1.5">
+                                <div id="strength-bar" class="bg-danger h-1.5 rounded-full" style="width: 25%"></div>
+                            </div>
+                        </div>
+                        <div id="password-error" class="hidden text-xs text-danger bg-danger/10 p-2 rounded mt-1">
+                            <i class="fa-regular fa-exclamation-circle mr-1"></i>
+                            <span>密码至少8位，包含大小写字母</span>
+                        </div>
+                        <div id="password-abc-error" class="hidden text-xs text-danger bg-danger/10 p-2 rounded mt-1">
+                            <i class="fa-regular fa-exclamation-circle mr-1"></i>
+                            <span>abc这样的密码太简单了，很容易被猜到</span>
+                        </div>
+                        <div id="password-123-error" class="hidden text-xs text-danger bg-danger/10 p-2 rounded mt-1">
+                            <i class="fa-regular fa-exclamation-circle mr-1"></i>
+                            <span>123456这样的密码太简单了，很容易被猜到</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="register-confirm-password" class="block text-sm font-medium text-white">确认密码</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">
+                                <i class="fa-regular fa-lock"></i>
+                            </span>
+                            <input type="password" id="register-confirm-password" name="register-confirm-password" placeholder="再次输入密码" class="w-full pl-10 pr-10 py-3 rounded-lg bg-white/10 dark:bg-dark/30 border border-white/20 dark:border-white/10 text-white placeholder-white/50 input-focus">
+                            <button type="button" id="register-toggle-confirm-password" class="absolute inset-y-0 right-0 flex items-center pr-3 text-white/70 hover:text-white">
+                                <i class="fa-regular fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <div id="password-match-error" class="hidden text-xs text-danger bg-danger/10 p-2 rounded mt-1">
+                            <i class="fa-regular fa-exclamation-circle mr-1"></i>
+                            <span>两次输入的密码不一致</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-4 bg-secondary hover:bg-secondary/90 text-white rounded-lg font-medium shadow-md btn-hover">
+                        注册
+                    </button>
+
+                    <div class="text-center text-white/70 text-sm">
+                        已有账号? <button type="button" id="switch-to-login" class="text-primary hover:text-primary/80 font-medium">立即登录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 开发测试按钮 -->
+    <div class="fixed bottom-4 left-4 z-50">
+        <button id="dev-tools-btn" class="w-12 h-12 rounded-full glass dark:glass-dark flex items-center justify-center text-white shadow-lg hover:bg-white/30 dark:hover:bg-dark/80 transition-all duration-300">
+            <i class="fa-regular fa-wrench text-xl"></i>
+        </button>
+    </div>
+
+    <!-- 开发测试面板 -->
+    <div id="dev-tools-panel" class="fixed bottom-20 left-4 w-64 glass dark:glass-dark rounded-xl shadow-xl p-4 hidden z-50">
+        <h3 class="text-white font-medium mb-3 flex items-center">
+            <i class="fa-regular fa-wrench mr-2"></i>开发测试工具
+        </h3>
+        <div class="space-y-2">
+            <button id="test-login-success" class="w-full py-2 px-3 bg-primary/80 hover:bg-primary text-white rounded-lg text-sm flex items-center justify-between">
+                <span>测试登录成功</span>
+                <i class="fa-regular fa-check"></i>
+            </button>
+            <button id="test-login-fail" class="w-full py-2 px-3 bg-danger/80 hover:bg-danger text-white rounded-lg text-sm flex items-center justify-between">
+                <span>测试登录失败</span>
+                <i class="fa-regular fa-times"></i>
+            </button>
+            <button id="test-register-success" class="w-full py-2 px-3 bg-secondary/80 hover:bg-secondary text-white rounded-lg text-sm flex items-center justify-between">
+                <span>测试注册成功</span>
+                <i class="fa-regular fa-user-plus"></i>
+            </button>
+            <button id="test-register-fail" class="w-full py-2 px-3 bg-danger/80 hover:bg-danger text-white rounded-lg text-sm flex items-center justify-between">
+                <span>测试注册失败</span>
+                <i class="fa-regular fa-times"></i>
+            </button>
+            <button id="test-server-connection" class="w-full py-2 px-3 bg-info/80 hover:bg-info text-white rounded-lg text-sm flex items-center justify-between">
+                <span>测试服务器连接</span>
+                <i class="fa-regular fa-server"></i>
+            </button>
+            <button id="test-error" class="w-full py-2 px-3 bg-warning/80 hover:bg-warning text-white rounded-lg text-sm flex items-center justify-between">
+                <span>测试错误提示</span>
+                <i class="fa-regular fa-bug"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 通知提示框 -->
+    <div id="notification" class="fixed top-4 right-4 w-80 glass dark:glass-dark rounded-xl shadow-xl p-4 transform translate-x-full transition-transform duration-500 z-50 flex items-start">
+        <div id="notification-icon" class="mr-3 text-xl text-primary">
+            <i class="fa-regular fa-info-circle"></i>
+        </div>
+        <div class="flex-1">
+            <h3 id="notification-title" class="text-white font-medium">通知标题</h3>
+            <p id="notification-message" class="text-white/80 text-sm mt-1">通知内容将显示在这里...</p>
+        </div>
+        <button id="close-notification" class="text-white/70 hover:text-white">
+            <i class="fa-regular fa-times"></i>
+        </button>
+    </div>
+
+    <!-- 错误提示框 -->
+    <div id="error-notification" class="fixed top-4 left-4 md:left-8 glass dark:glass-dark rounded-xl shadow-xl p-3 flex items-center text-white text-sm hidden z-50">
+        <i class="fa-regular fa-exclamation-triangle text-danger mr-2"></i>
+        <span>程序出现错误按F12查看</span>
+    </div>
+
+    <!-- 服务器连接状态 -->
+    <div id="server-status" class="fixed top-4 left-1/2 transform -translate-x-1/2 glass dark:glass-dark rounded-full px-4 py-2 flex items-center text-white text-sm transition-all duration-300 z-40">
+        <div id="connection-indicator" class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
+        <span id="connection-text">服务器连接正常</span>
+    </div>
+
+    <script>
+        // DOM 元素
+        const themeToggle = document.getElementById('theme-toggle');
+        const background = document.getElementById('background');
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const switchToRegister = document.getElementById('switch-to-register');
+        const switchToLogin = document.getElementById('switch-to-login');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const loginTogglePassword = document.getElementById('login-toggle-password');
+        const registerEmail = document.getElementById('register-email');
+        const registerUsername = document.getElementById('register-username');
+        const registerPassword = document.getElementById('register-password');
+        const registerConfirmPassword = document.getElementById('register-confirm-password');
+        const registerTogglePassword = document.getElementById('register-toggle-password');
+        const registerToggleConfirmPassword = document.getElementById('register-toggle-confirm-password');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+        const passwordAbcError = document.getElementById('password-abc-error');
+        const password123Error = document.getElementById('password-123-error');
+        const passwordMatchError = document.getElementById('password-match-error');
+        const passwordStrength = document.getElementById('password-strength');
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthText = document.getElementById('strength-text');
+        const devToolsBtn = document.getElementById('dev-tools-btn');
+        const devToolsPanel = document.getElementById('dev-tools-panel');
+        const notification = document.getElementById('notification');
+        const notificationIcon = document.getElementById('notification-icon');
+        const notificationTitle = document.getElementById('notification-title');
+        const notificationMessage = document.getElementById('notification-message');
+        const closeNotification = document.getElementById('close-notification');
+        const errorNotification = document.getElementById('error-notification');
+        const serverStatus = document.getElementById('server-status');
+        const connectionIndicator = document.getElementById('connection-indicator');
+        const connectionText = document.getElementById('connection-text');
+
+        // 主题切换
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                background.style.backgroundImage = "url('https://lr-luorui.cn/static/background-dark.webp')";
+                themeToggle.innerHTML = '<i class="fa-regular fa-moon text-xl"></i>';
+            } else {
+                background.style.backgroundImage = "url('https://lr-luorui.cn/static/background.png')";
+                themeToggle.innerHTML = '<i class="fa-regular fa-sun text-xl"></i>';
+            }
+        }
+
+        // 切换登录/注册表单
+        function showLoginForm() {
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            loginTab.classList.add('text-white', 'border-primary');
+            loginTab.classList.remove('text-white/70', 'border-transparent');
+            registerTab.classList.add('text-white/70', 'border-transparent');
+            registerTab.classList.remove('text-white', 'border-primary');
+        }
+
+        function showRegisterForm() {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            loginTab.classList.remove('text-white', 'border-primary');
+            loginTab.classList.add('text-white/70', 'border-transparent');
+            registerTab.classList.remove('text-white/70', 'border-transparent');
+            registerTab.classList.add('text-white', 'border-primary');
+        }
+
+        // 切换密码可见性
+        function toggleLoginPasswordVisibility() {
+            const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            loginPassword.setAttribute('type', type);
+            loginTogglePassword.innerHTML = type === 'password' ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+        }
+
+        function toggleRegisterPasswordVisibility() {
+            const type = registerPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            registerPassword.setAttribute('type', type);
+            registerTogglePassword.innerHTML = type === 'password' ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+            checkPasswordStrength();
+        }
+
+        function toggleRegisterConfirmPasswordVisibility() {
+            const type = registerConfirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            registerConfirmPassword.setAttribute('type', type);
+            registerToggleConfirmPassword.innerHTML = type === 'password' ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+        }
+
+        // 检查邮箱格式
+        function validateEmail(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        // 实时检查邮箱格式
+        function checkEmail() {
+            const email = registerEmail.value;
+            if (email && !validateEmail(email)) {
+                emailError.classList.remove('hidden');
+            } else {
+                emailError.classList.add('hidden');
+            }
+        }
+
+        // 检查密码强度
+        function checkPasswordStrength() {
+            const password = registerPassword.value;
+            if (!password) {
+                passwordStrength.classList.add('hidden');
+                return;
+            }
+            passwordStrength.classList.remove('hidden');
+
+            // 密码强度评分
+            let score = 0;
+            let strengthClass = 'bg-danger';
+            let strengthLabel = '弱';
+
+            // 基本长度检查
+            if (password.length >= 8) score += 25;
+            if (password.length >= 12) score += 10;
+
+            // 包含小写字母
+            if (/[a-z]/.test(password)) score += 15;
+
+            // 包含大写字母
+            if (/[A-Z]/.test(password)) score += 15;
+
+            // 包含数字
+            if (/[0-9]/.test(password)) score += 15;
+
+            // 包含特殊字符
+            if (/[^A-Za-z0-9]/.test(password)) score += 20;
+
+            // 检查简单密码模式
+            if (password.toLowerCase().includes('abc')) {
+                passwordAbcError.classList.remove('hidden');
+                score = Math.min(score, 25); // 限制最低分数
+            } else {
+                passwordAbcError.classList.add('hidden');
+            }
+
+            if (password.toLowerCase().includes('123')) {
+                password123Error.classList.remove('hidden');
+                score = Math.min(score, 25); // 限制最低分数
+            } else {
+                password123Error.classList.add('hidden');
+            }
+
+            // 更新强度显示
+            if (score >= 80) {
+                strengthClass = 'bg-secondary';
+                strengthLabel = '强';
+            } else if (score >= 50) {
+                strengthClass = 'bg-warning';
+                strengthLabel = '中';
+            }
+
+            strengthBar.className = `h-1.5 rounded-full ${strengthClass}`;
+            strengthBar.style.width = `${score}%`;
+            strengthText.textContent = strengthLabel;
+        }
+
+        // 检查密码匹配
+        function checkPasswordMatch() {
+            const password = registerPassword.value;
+            const confirmPassword = registerConfirmPassword.value;
+
+            if (password && confirmPassword && password !== confirmPassword) {
+                passwordMatchError.classList.remove('hidden');
+            } else {
+                passwordMatchError.classList.add('hidden');
+            }
+        }
+
+        // 检查所有注册字段
+        function validateRegisterForm() {
+            let isValid = true;
+
+            // 检查邮箱
+            if (!validateEmail(registerEmail.value)) {
+                emailError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                emailError.classList.add('hidden');
+            }
+
+            // 检查密码长度
+            if (registerPassword.value.length < 8) {
+                passwordError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                passwordError.classList.add('hidden');
+            }
+
+            // 检查密码包含大小写
+            if (!/[a-z]/.test(registerPassword.value) || !/[A-Z]/.test(registerPassword.value)) {
+                passwordError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                passwordError.classList.add('hidden');
+            }
+
+            // 检查密码匹配
+            if (registerPassword.value !== registerConfirmPassword.value) {
+                passwordMatchError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                passwordMatchError.classList.add('hidden');
+            }
+
+            // 检查简单密码
+            if (registerPassword.value.toLowerCase().includes('abc')) {
+                passwordAbcError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                passwordAbcError.classList.add('hidden');
+            }
+
+            if (registerPassword.value.toLowerCase().includes('123')) {
+                password123Error.classList.remove('hidden');
+                isValid = false;
+            } else {
+                password123Error.classList.add('hidden');
+            }
+
+            if (!isValid) {
+                registerForm.classList.add('form-shake');
+                setTimeout(() => {
+                    registerForm.classList.remove('form-shake');
+                }, 500);
+            }
+
+            return isValid;
+        }
+
+        // 显示通知
+        function showNotification(title, message, type = 'info') {
+            // 设置通知类型
+            notification.className = 'fixed top-4 right-4 w-80 glass dark:glass-dark rounded-xl shadow-xl p-4 transform translate-x-0 transition-transform duration-500 z-50 flex items-start';
+            
+            // 设置图标和颜色
+            switch(type) {
+                case 'success':
+                    notificationIcon.className = 'mr-3 text-xl text-secondary';
+                    notificationIcon.innerHTML = '<i class="fa-regular fa-check-circle"></i>';
+                    break;
+                case 'error':
+                    notificationIcon.className = 'mr-3 text-xl text-danger';
+                    notificationIcon.innerHTML = '<i class="fa-regular fa-exclamation-circle"></i>';
+                    break;
+                case 'warning':
+                    notificationIcon.className = 'mr-3 text-xl text-warning';
+                    notificationIcon.innerHTML = '<i class="fa-regular fa-exclamation-triangle"></i>';
+                    break;
+                case 'info':
+                default:
+                    notificationIcon.className = 'mr-3 text-xl text-primary';
+                    notificationIcon.innerHTML = '<i class="fa-regular fa-info-circle"></i>';
+                    break;
+            }
+            
+            // 设置标题和内容
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // 显示通知
+            notification.style.transform = 'translateX(0)';
+            
+            // 3秒后自动关闭
+            setTimeout(hideNotification, 3000);
+        }
+
+        // 隐藏通知
+        function hideNotification() {
+            notification.style.transform = 'translateX(calc(100% + 1rem))';
+        }
+
+        // 显示错误提示
+        function showErrorNotification() {
+            errorNotification.classList.remove('hidden');
+            setTimeout(() => {
+                errorNotification.classList.add('hidden');
+            }, 5000);
+        }
+
+        // 模拟服务器连接
+        let isServerConnected = true;
+        let connectionAttempts = 0;
+
+        function checkServerConnection() {
+            // 模拟服务器连接状态
+            // 实际应用中应该使用WebSocket或定期AJAX请求检查连接状态
+            connectionAttempts++;
+            
+            // 模拟每5次尝试失败一次
+            isServerConnected = connectionAttempts % 5 !== 0;
+            
+            if (isServerConnected) {
+                connectionIndicator.className = 'w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse';
+                connectionText.textContent = '服务器连接正常';
+                serverStatus.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 glass dark:glass-dark rounded-full px-4 py-2 flex items-center text-white text-sm transition-all duration-300 z-40';
+            } else {
+                connectionIndicator.className = 'w-2 h-2 rounded-full bg-danger mr-2';
+                connectionText.textContent = '服务器连接失败，正在重试...';
+                serverStatus.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 glass dark:glass-dark bg-danger/20 rounded-full px-4 py-2 flex items-center text-white text-sm transition-all duration-300 z-40';
+                showNotification('连接错误', '服务器连接失败，请检查网络连接', 'error');
+            }
+            
+            // 每20秒检查一次
+            setTimeout(checkServerConnection, 20000);
+        }
+
+        // 登录处理
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            // 检查服务器连接
+            if (!isServerConnected) {
+                showNotification('连接错误', '无法连接到服务器，请稍后再试', 'error');
+                return;
+            }
+            
+            // 收集表单数据
+            const email = loginEmail.value;
+            const password = loginPassword.value;
+            
+            // 简单验证
+            if (!email || !password) {
+                showNotification('输入错误', '请填写邮箱和密码', 'warning');
+                return;
+            }
+            
+            // 模拟登录API调用
+            // 实际应用中应该使用fetch或axios发送数据到后端
+            console.log('登录API调用:', { email, password });
+            
+            // 模拟登录成功
+            // 这里应该根据实际API返回结果处理
+            // 示例API返回格式: { success: true, message: '登录成功', token: 'xxxxxx' }
+            // 示例API返回格式: { success: false, message: '用户名或密码错误' }
+            
+            // 模拟网络延迟
+            setTimeout(() => {
+                showNotification('登录成功', '欢迎回来，正在跳转...', 'success');
+                
+                // 模拟跳转到个人页面
+                setTimeout(() => {
+                    // 实际应用中应该使用window.location.href跳转
+                    console.log('跳转到个人页面');
+                }, 1500);
+            }, 1000);
+        }
+
+        // 注册处理
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            // 检查服务器连接
+            if (!isServerConnected) {
+                showNotification('连接错误', '无法连接到服务器，请稍后再试', 'error');
+                return;
+            }
+            
+            // 验证表单
+            if (!validateRegisterForm()) {
+                return;
+            }
+            
+            // 收集表单数据
+            const email = registerEmail.value;
+            const username = registerUsername.value;
+            const password = registerPassword.value;
+            
+            // 模拟注册API调用
+            // 实际应用中应该使用fetch或axios发送数据到后端
+            console.log('注册API调用:', { email, username, password });
+            
+            // 模拟注册成功
+            // 这里应该根据实际API返回结果处理
+            // 示例API返回格式: { success: true, message: '注册成功，请登录' }
+            // 示例API返回格式: { success: false, message: '邮箱已被注册' }
+            
+            // 模拟网络延迟
+            setTimeout(() => {
+                showNotification('注册成功', '您已成功注册，请登录', 'success');
+                
+                // 切换到登录表单
+                showLoginForm();
+                
+                // 清空注册表单
+                registerEmail.value = '';
+                registerUsername.value = '';
+                registerPassword.value = '';
+                registerConfirmPassword.value = '';
+                
+                // 隐藏所有错误提示
+                emailError.classList.add('hidden');
+                passwordError.classList.add('hidden');
+                passwordAbcError.classList.add('hidden');
+                password123Error.classList.add('hidden');
+                passwordMatchError.classList.add('hidden');
+                passwordStrength.classList.add('hidden');
+            }, 1000);
+        }
+
+        // 开发测试工具
+        function toggleDevTools() {
+            devToolsPanel.classList.toggle('hidden');
+        }
+
+        function testLoginSuccess() {
+            showNotification('登录成功', '欢迎回来，正在跳转...', 'success');
+        }
+
+        function testLoginFail() {
+            showNotification('登录失败', '用户名或密码错误', 'error');
+        }
+
+        function testRegisterSuccess() {
+            showNotification('注册成功', '您已成功注册，请登录', 'success');
+        }
+
+        function testRegisterFail() {
+            showNotification('注册失败', '邮箱已被注册', 'error');
+        }
+
+        function testServerConnection() {
+            // 切换服务器连接状态
+            isServerConnected = !isServerConnected;
+            
+            if (isServerConnected) {
+                connectionIndicator.className = 'w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse';
+                connectionText.textContent = '服务器连接正常';
+                serverStatus.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 glass dark:glass-dark rounded-full px-4 py-2 flex items-center text-white text-sm transition-all duration-300 z-40';
+                showNotification('连接成功', '已成功连接到服务器', 'success');
+            } else {
+                connectionIndicator.className = 'w-2 h-2 rounded-full bg-danger mr-2';
+                connectionText.textContent = '服务器连接失败，正在重试...';
+                serverStatus.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 glass dark:glass-dark bg-danger/20 rounded-full px-4 py-2 flex items-center text-white text-sm transition-all duration-300 z-40';
+                showNotification('连接错误', '服务器连接失败，请检查网络连接', 'error');
+            }
+        }
+
+        function testError() {
+            showErrorNotification();
+        }
+
+        // 事件监听
+        themeToggle.addEventListener('click', toggleTheme);
+        loginTab.addEventListener('click', showLoginForm);
+        registerTab.addEventListener('click', showRegisterForm);
+        switchToRegister.addEventListener('click', showRegisterForm);
+        switchToLogin.addEventListener('click', showLoginForm);
+        loginTogglePassword.addEventListener('click', toggleLoginPasswordVisibility);
+        registerTogglePassword.addEventListener('click', toggleRegisterPasswordVisibility);
+        registerToggleConfirmPassword.addEventListener('click', toggleRegisterConfirmPasswordVisibility);
+        registerEmail.addEventListener('input', checkEmail);
+        registerPassword.addEventListener('input', checkPasswordStrength);
+        registerPassword.addEventListener('input', checkPasswordMatch);
+        registerConfirmPassword.addEventListener('input', checkPasswordMatch);
+        loginForm.addEventListener('submit', handleLogin);
+        registerForm.addEventListener('submit', handleRegister);
+        devToolsBtn.addEventListener('click', toggleDevTools);
+        closeNotification.addEventListener('click', hideNotification);
+        document.getElementById('test-login-success').addEventListener('click', testLoginSuccess);
+        document.getElementById('test-login-fail').addEventListener('click', testLoginFail);
+        document.getElementById('test-register-success').addEventListener('click', testRegisterSuccess);
+        document.getElementById('test-register-fail').addEventListener('click', testRegisterFail);
+        document.getElementById('test-server-connection').addEventListener('click', testServerConnection);
+        document.getElementById('test-error').addEventListener('click', testError);
+
+        // 初始化
+        function init() {
+            // 检查系统主题
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+                background.style.backgroundImage = "url('https://lr-luorui.cn/static/background-dark.webp')";
+                themeToggle.innerHTML = '<i class="fa-regular fa-moon text-xl"></i>';
+            } else {
+                document.documentElement.classList.remove('dark');
+                background.style.backgroundImage = "url('https://lr-luorui.cn/static/background.png')";
+                themeToggle.innerHTML = '<i class="fa-regular fa-sun text-xl"></i>';
+            }
+            
+            // 隐藏密码强度指示器
+            passwordStrength.classList.add('hidden');
+            
+            // 启动服务器连接检查
+            checkServerConnection();
+        }
+
+        // 启动应用
+        init();
+    </script>
+</body>
+</html>
+    
